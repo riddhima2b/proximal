@@ -4,13 +4,13 @@ import (
 	"flag"
 	"log"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
+	"proximal/proxy"
 )
 
 func main() {
 
-	port := flag.String("port", "8080", "Port to listen on")
+	port := flag.String("port", "", "Port to listen on")
 	origin := flag.String("origin", "", "Origin server to proxy to")
 
 	flag.Parse()
@@ -22,12 +22,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to parse origin URL: %v", err)
 	}
-	p := &httputil.ReverseProxy{
-		Rewrite: func(r *httputil.ProxyRequest) {
-			r.SetURL(target)
-			r.SetXForwarded()
-		},
-	}
+	p := proxy.TryProxy(target)
 
 	addr := ":" + *port
 

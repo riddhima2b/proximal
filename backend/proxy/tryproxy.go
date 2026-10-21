@@ -5,10 +5,13 @@ import (
 	"net/url"
 )
 
-func TryProxy() *httputil.ReverseProxy {
-	proxy := httputil.NewSingleHostReverseProxy(&url.URL{
-		Scheme: "http",
-		Host:   "localhost:9000",
-	})
+func TryProxy(target *url.URL) *httputil.ReverseProxy {
+	proxy := &httputil.ReverseProxy{
+		Rewrite: func(r *httputil.ProxyRequest) {
+			r.SetURL(target)
+			r.SetXForwarded()
+		},
+	}
+
 	return proxy
 }
